@@ -35,6 +35,7 @@ enter ssh-keygen -->yes-->yes
 Copy generated public key (You will find your keys in .ssh folder in c drive/users/.ssh)
 #Go to GitHub-->Settings--> SSh and GPG keys-->New SSH key--> paste the key--> Add ssh key
 #Go to VS code
+#select git bash
 Cone the repository 
 git clone <github ssh key link>
 #Go to your directory 
@@ -45,3 +46,34 @@ cd <your repository name>
 mkdir day-1 installation
 mkdir day2-sample-base-code
 Create files provider.tf and main.tf
+#initialise the plugins from terraform registry
+terraform init
+#create blue print, what you are going to create
+terraform plan
+
+#Code within main.tf
+resource "aws_instance" "name" {
+    ami = var.ami_id
+    instance_type = var.type
+   
+  
+}
+
+#Create .gitignore file within Terraform repository directory
+
+# Local .terraform directories
+**/.terraform/*
+
+# Terraform state files
+*.tfstate
+*.tfstate.*
+
+# Terraform lock file
+.terraform.lock.hcl
+# documents
+*.doc
+
+git status
+git add .
+git commit -m "Comment the changes day2"
+git push
