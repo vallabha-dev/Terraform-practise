@@ -1,0 +1,47 @@
+######### Terraform Day1 #########
+IaC(Infrastructure aas Code)-Create or Update infrastructure with the help of IaC tool
+Terraform- Third parthy tool, not fully open source, supports AWs, Azure, GCP etc
+Other IaC tools, AWS CloudFormation, Azure Arm template, Google Resource manager
+Terraform written in Go language
+Supported languages- HCL or JSON
+Alternative to terraform is OpenTofu (Fully opensource)
+Terraform is opensouce at personal use.
+Terraform Registry in order to choose the service AWS or AZURE or GCP
+#### COMMANDS ####
+'Terraform Init' command will initialise the plugins from terraform registry to working directory
+AWS plugins helps to interact with AWS environment
+CLI for keys to autherise account
+'Terraform plan' command- create blue print, what you are going to create
+'Terraform apply' command- create resources as per the code
+#### Configuration files ####
+Provider.tf--> where we can add providers details
+main.tf-->where we can add resourse details(ec2, s3, rds)
+variables.tf--> variables of the values to insert into main.tf instead of hard coding the value
+output.tf--> it will print the required valuesafter creating the resources
+
+### Terraform Practice ###
+Create 'Terraform' folder in your pc
+Download VS code(Ignore if already there There)
+Files--> Open Folder--> Choose Terraform Folder
+Extensions-->Hashicorp--> Install HashiCorp HCL, Hashicorp sentinel, Hashicorp terraform
+Download Terraform v1.12.2
+Set up environment variables
+cmd terraform --version    -check terraform confirmation
+Download git (Ignore if already there)
+Create Github account (Ignore if already have) and create a repository
+Go to vs code
+#Command to create key from your laptop to connect to github
+enter ssh-keygen -->yes-->yes  
+Copy generated public key (You will find your keys in .ssh folder in c drive/users/.ssh)
+#Go to GitHub-->Settings--> SSh and GPG keys-->New SSH key--> paste the key--> Add ssh key
+#Go to VS code
+Cone the repository 
+git clone <github ssh key link>
+#Go to your directory 
+cd <your repository name>
+#Configure your aws account with access key and secret key
+
+#Create daywise directories
+mkdir day-1 installation
+mkdir day2-sample-base-code
+Create files provider.tf and main.tf
