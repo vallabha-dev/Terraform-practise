@@ -43,8 +43,7 @@ cd <your repository name>
 #Configure your aws account with access key and secret key
 
 #Create daywise directories
-mkdir day-1 installation
-mkdir day2-sample-base-code
+mkdir day-1 installation sample-code
 Create files provider.tf and main.tf
 #initialise the plugins from terraform registry
 terraform init
