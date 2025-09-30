@@ -1,0 +1,6 @@
+What is Terraform statefile?
+First time-Track all resources information from cloud
+Second time- After every 'terraform apply' command, statefile will refresh and track the resource.
+Work like a interface between working directory and remote(cloud). Bridge between desired state and acual state
+
+
