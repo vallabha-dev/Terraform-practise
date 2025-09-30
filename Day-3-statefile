@@ -1,6 +1,11 @@
-What is Terraform statefile?
+What is Terraform statefile? { I don't know what is there in remote(cloud), so i take the help of statefile}
 First time-Track all resources information from cloud
-Second time- After every 'terraform apply' command, statefile will refresh and track the resource.
+Second time- After every 'terraform plan/apply' command, statefile will refresh and track the resource.
 Work like a interface between working directory and remote(cloud). Bridge between desired state and acual state
-
-
+Use case:important!!!!
+1. When you delete statefile, and again enter terraform apply, since statefile is not there in the working directory, it create another resource
+2. When you change the instance type, then statefile tracks the resource, existing instance will stop, type will change and again instance will restart
+3. When you  enter the wongly ami id, terraform apply,  then statefile tracks the resource, existing will be deleted first, new one willn't be created.
+4. When server is created and deleted, statefile will be null
+5. Manually you changed the instance name ex tag = test, but in your working directory tag = dev, then enter terraform plan, you will see actual state is Test, desired state is Dev. Here Instance won't be deleted/stopped/terminnated for renoming
+6. Server stopped manually, enterTerraform plan, you won't see change of the state, because Terraform is Infrastructure as the code, not worry about state 
