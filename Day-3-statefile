@@ -2,10 +2,130 @@ What is Terraform statefile? { I don't know what is there in remote(cloud), so i
 First time-Track all resources information from cloud
 Second time- After every 'terraform plan/apply' command, statefile will refresh and track the resource.
 Work like a interface between working directory and remote(cloud). Bridge between desired state and acual state
-Use case:important!!!!
+
+Use case:important!!!! Interview questions
 1. When you delete statefile, and again enter terraform apply, since statefile is not there in the working directory, it create another resource
 2. When you change the instance type, then statefile tracks the resource, existing instance will stop, type will change and again instance will restart
 3. When you  enter the wongly ami id, terraform apply,  then statefile tracks the resource, existing will be deleted first, new one willn't be created.
 4. When server is created and deleted, statefile will be null
 5. Manually you changed the instance name ex tag = test, but in your working directory tag = dev, then enter terraform plan, you will see actual state is Test, desired state is Dev. Here Instance won't be deleted/stopped/terminnated for renoming
 6. Server stopped manually, enterTerraform plan, you won't see change of the state, because Terraform is Infrastructure as the code, not worry about state 
+7. Manually change the code in statefile, then terraform plan and apply,file will refresh and remote data will appear.
+8. rename state file, then terraform plan, a new statefile will be created
+
+#### Create IAM role ####
+Manually, attach iam role to server, then check terraform plan, you see 'no changes' because you don't have any code written on Iam role. But state file will update iam role in the directory.
+
+
+## 🔹 What is the Terraform state file?
+
+* It’s a **JSON file** (`terraform.tfstate`) that Terraform maintains to keep track of:
+
+  1. **Real-world resources** (what’s actually created in AWS, Azure, etc.)
+  2. **Your configuration** (HCL code you wrote)
+  3. The **mapping between the two** (so Terraform knows: “this EC2 instance in AWS is the `aws_instance.example` in my code”).
+
+Without the state file, Terraform wouldn’t know what resources already exist and would try to recreate everything.
+
+---
+
+## 🔹 How it works (step by step)
+
+1. **You write config**
+
+   ```hcl
+   resource "aws_instance" "example" {
+     ami           = "ami-123456"
+     instance_type = "t2.micro"
+   }
+   
+2. **You run `terraform apply`**
+
+   * Terraform checks the state file (`terraform.tfstate`) to see if the resource already exists.
+   * If not found, it creates the resource in AWS.
+   * Then it **writes details** (like instance ID, IP, tags) into the state file.
+
+3. **Next apply**
+
+   * If you change `instance_type = "t3.micro"` and re-run `terraform apply`, Terraform compares:
+
+     * Config (`t3.micro`)
+     * State file (`t2.micro`)
+     * Real infra (AWS)
+   * It sees a difference and updates the instance.
+   * Finally, it updates the state file with the new info.
+
+## 🔹 Key points about the state file
+
+* **Location**: By default, it’s local (`terraform.tfstate` in your project folder).
+* **Sensitive data**: It may contain secrets (passwords, private keys, etc.), so never commit it to Git.
+* **Backend support**: For teams, store it remotely (e.g., S3 + DynamoDB, Azure Blob, GCS, Terraform Cloud) so everyone shares the same state.
+
+
+## 🔹 State file operations
+
+* `terraform show` → see what’s in the state file.
+* `terraform state list` → list tracked resources.
+* `terraform state show <resource>` → details of one resource.
+* `terraform state rm <resource>` → remove from state (Terraform forgets it exists, but doesn’t delete it in cloud).
+* `terraform import` → bring an existing resource into state.
+
+---
+
+## 🔹 Example (simplified view of a state file)
+
+```json
+{
+  "version": 4,
+  "resources": [
+    {
+      "type": "aws_instance",
+      "name": "example",
+      "instances": [
+        {
+          "attributes": {
+            "id": "i-0abcd1234ef567890",
+            "ami": "ami-123456",
+            "instance_type": "t2.micro",
+            "public_ip": "3.92.181.42"
+          }
+        }
+      ]
+    }
+  ]
+}
+```
+
+Terraform uses this to know:
+
+* The EC2 instance with ID `i-0abcd1234ef567890` belongs to `aws_instance.example`.
+✅ **In short:** The **state file is Terraform’s source of truth** for mapping your code to real cloud resources. It allows Terraform to plan updates, detect drift, and avoid recreating everything each time.
+
+##### Backend Block ####
+🔹 What is the backend block?
+
+A backend tells Terraform where and how to store its state file (terraform.tfstate).
+
+By default, Terraform uses the local backend → the state file is saved on your local machine.
+
+Using a backend block, you can configure a remote backend like AWS S3, Azure Blob, GCS, or Terraform Cloud.
+
+This is super important in team environments where multiple people are applying Terraform — you don’t want each person keeping a different local state.
+
+🔹 Example: Local (default)
+
+Without a backend block, Terraform stores state in terraform.tfstate in your project folder.
+
+🔹 Example: Remote backend (AWS S3)
+terraform {
+  backend "s3" {
+    bucket         = "my-terraform-states"
+    key            = "dev/terraform.tfstate"
+    region         = "us-east-1"
+  
+  }
+}
+
+What this does:
+
+Stores state file in an S3 bucket instead of locally.
