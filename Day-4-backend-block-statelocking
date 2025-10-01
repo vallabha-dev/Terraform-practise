@@ -1,0 +1,4 @@
+#### Statelocking ####
+Use case- two developers are working in a same project, if they store their statefile into local 
+1.resource duplication with individual work
+2.collaboration not possible
