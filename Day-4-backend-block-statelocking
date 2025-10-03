@@ -2,3 +2,127 @@
 Use case- two developers are working in a same project, if they store their statefile into local 
 1.resource duplication with individual work
 2.collaboration not possible
+## Practical: Your system is considered as one developer, ec2 instance considered as another developer
+Go to ec2 instance
+install terraform 
+sudo yum install -y yum-utils shadow-utils
+sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo
+sudo yum install terraform
+
+Install git
+yum install git -y
+
+
+
+Go to Visual Studio IDE
+Create a Day4 directory
+
+
+NOW Push your latest code to git repository 
+git status
+git add . 
+git commit -m "latest changes"
+git push
+
+Go to ec2 instance
+Clone the terrafrom repository 
+git clone https://github.com/vallabha-dev/Terraform-practise.git
+
+Go to day4 directory and then check 
+you won't see any files
+
+NOW go to VS
+Create provider.tf file
+provider "aws"{
+region = "mention your region"
+}
+Create main.tf
+resource "aws_instance" "name"{
+ami = "ami id"
+instance_type = "t2.micro"
+
+}
+terraform init
+terraform plan
+terraform apply
+(you will observe a new resource is created along with terraform.tfstate file)
+
+NOW Push your latest code to git repository 
+git status
+git add . 
+git commit -m "latest changes"
+git push
+
+NOW go to ec2, in Day4 directory check files you won't see any
+click terraform init
+then terraform plan
+
+In order to sync Visual studio code into 
+create vi terraform.tfstate
+paste 'terraform.tfstate' code from virtual studio IDE
+
+Run terraform init / terraform init -reconfigure
+
+NOT HAVING LATEST STATEFILE WILL CREATE CONFLICT, SO S3 will help to resolve this
+
+In VS IDE
+create backend.tf file in day-4 directory
+paste below code
+terraform {
+  backend "s3" {
+    bucket         = "my-terraform-states"
+    key            = "day4/terraform.tfstate"
+    region         = "us-east-1"
+  
+  }
+}
+
+Run terraform init / terraform init -reconfigure
+
+this will ask 'do you want to copy existing state to the new backend?' answer-yes
+
+Run terraform plan
+Run terraform apply -auto-approve
+
+git status
+git add .
+git commit -m "backend changes"
+git push
+
+Go to ec2 instance
+git status
+git pull
+
+you will see backend.tf file, main.tf and provider.tf file    -this backend.tf file will communicate with s3 
+Run terraform init
+terraform plan        -you willsee 'no changes'
+
+Suppose if you make any changes in ec2 server files, that won't reflect in VS local
+In order to sync, git push from ec2 and git pull from VS local
+
+For Both developers- common source code is - GitHub
+For both developers- common staefile is -S3 (backend.tf file)
+
+
+##### Statelocking #####
+Method 1 s3 native locking
+backend.tf file
+terraform {
+  backend "s3" {
+    bucket         = "my-terraform-states"
+    key            = "day4/terraform.tfstate"
+    region         = "us-east-1"
+    use_lockfile = true            #s3 supports this feature for terraform version >=1.10
+  
+  }
+}
+Run terraform init / terraform init -reconfigure
+Run terraform plan
+Run terraform apply -auto-approve
+
+Repeat (VS IDE) git status, git add . , git commit, git push ----------> (ec2) git pull 
+Run terraform init / terraform init -reconfigure
+Run terraform plan
+Run terraform apply -auto-approve
+
+Method 2 by using dynamo db
