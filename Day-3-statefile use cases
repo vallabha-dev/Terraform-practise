@@ -101,7 +101,7 @@ Terraform uses this to know:
 * The EC2 instance with ID `i-0abcd1234ef567890` belongs to `aws_instance.example`.
 ✅ **In short:** The **state file is Terraform’s source of truth** for mapping your code to real cloud resources. It allows Terraform to plan updates, detect drift, and avoid recreating everything each time.
 
-##### Backend Block ####
+##### Backend Block Stateblocking####
 🔹 What is the backend block?
 
 A backend tells Terraform where and how to store its state file (terraform.tfstate).
@@ -115,12 +115,13 @@ This is super important in team environments where multiple people are applying 
 🔹 Example: Local (default)
 
 Without a backend block, Terraform stores state in terraform.tfstate in your project folder.
+Create a backend.tf file
 
 🔹 Example: Remote backend (AWS S3)
 terraform {
   backend "s3" {
     bucket         = "my-terraform-states"
-    key            = "dev/terraform.tfstate"
+    key            = "day3/terraform.tfstate"
     region         = "us-east-1"
   
   }
